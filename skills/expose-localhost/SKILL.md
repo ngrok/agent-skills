@@ -44,13 +44,7 @@ Do NOT mention cloud endpoints, reserved domains, or internal endpoints — thos
 
 **Detecting the port**: Check `package.json` scripts for `--port`, `.env` for `PORT=`, `docker-compose.yml` for port mappings.
 
-**Domains**: Most ngrok accounts have a free static dev domain (e.g., `something.ngrok-free.dev`). However, some accounts (especially new ones) may not have one yet. During pre-flight, check if the user has a dev domain:
-
-```bash
-ngrok api reserved-domains list 2>/dev/null | grep -o '"domain":"[^"]*"' | head -1
-```
-
-If no domain is found, tell the user: "You don't have a dev domain yet. Claim your free one at https://dashboard.ngrok.com/domains — then we can continue." Do NOT proceed without a domain when using `--traffic-policy-file`, as ngrok requires an explicit `--url` for traffic policies.
+**Domains**: Most ngrok accounts have a free static dev domain (e.g., `something.ngrok-free.dev`). Running `ngrok http PORT` uses it automatically. Users can also provide a custom domain configured in the ngrok dashboard. Some accounts (especially new ones) may not have a dev domain yet — if ngrok fails with `ERR_NGROK_15013`, tell the user: "You don't have a dev domain yet. Claim your free one at https://dashboard.ngrok.com/domains — then we can try again."
 
 **If user requests OAuth**, also ask: "Should only specific people be able to access it? I can restrict by email address or email domain."
 
@@ -60,21 +54,13 @@ After gathering answers, confirm and get a Y/n before proceeding.
 
 #### No security (simplest)
 
-If the user has a domain, use `--url`:
-
-```bash
-ngrok http {PORT} --url https://{DOMAIN} &
-sleep 3
-curl -s http://localhost:4040/api/tunnels | grep -o '"public_url":"[^"]*"' | head -1
-```
-
-Without a domain (ephemeral URL, no traffic policy):
-
 ```bash
 ngrok http {PORT} &
 sleep 3
 curl -s http://localhost:4040/api/tunnels | grep -o '"public_url":"[^"]*"' | head -1
 ```
+
+With a specific domain, add `--url https://{DOMAIN}`.
 
 #### With security (Traffic Policy)
 
