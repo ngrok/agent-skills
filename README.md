@@ -29,6 +29,22 @@ Expose a local service to the public internet using ngrok. Optionally add OAuth,
 - Optional rate limiting
 - Email/domain-based access restriction
 
+### block-unwanted-traffic
+
+Generate or extend an ngrok Traffic Policy that blocks unwanted traffic using IP Intelligence categories and geo data. Pairs with `expose-localhost` or an existing cloud endpoint.
+
+**Use when:**
+- "Block scanners from hitting my endpoint"
+- "Deny traffic from Tor / VPNs / anonymous proxies"
+- "Block traffic from these countries"
+- "Add a deny rule to my traffic policy"
+
+**Features:**
+- Blocks known scanners (Censys, CCBot) with low false-positive risk
+- Blocks anonymous proxies, Tor exit nodes, and named VPN providers
+- Geo-based blocking by two-letter ISO country code, with footgun warnings
+- Writes a new policy, appends to an existing `.ngrok/traffic-policy.yml`, or updates a cloud endpoint
+
 ## Usage
 
 Skills are automatically available once installed. The agent will use them when relevant tasks are detected.
