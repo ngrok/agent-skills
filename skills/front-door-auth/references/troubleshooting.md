@@ -31,7 +31,7 @@ ngrok api endpoints delete <ENDPOINT_ID>
 
 ## App shows "Hello, undefined"
 
-The `X-Forwarded-User-Name` header is missing. Some providers don't return a name for all users. The middleware should fall back to `email.split('@')[0]` — check the snippet in `references/frameworks/{framework}.md` and confirm the fallback is in place.
+The `X-Forwarded-User-Name` header is missing. Some providers don't return a name for all users. The middleware should fall back to `email.split('@')[0]`. Check the snippet in `references/frameworks/{framework}.md` and confirm the fallback is in place.
 
 ## Edits to `traffic-policy.yml` aren't taking effect
 
@@ -46,7 +46,7 @@ ngrok api endpoints update <ENDPOINT_ID> --traffic-policy-file traffic-policy.ym
 
 The internal endpoint isn't running. Either:
 
-- The agent isn't running — `ngrok start --all`.
+- The agent isn't running. Start it with `ngrok start --all`.
 - The agent's `ngrok.yml` has a different URL than the policy's `forward-internal.config.url`. They must match exactly, including scheme.
 
 ## Plan limit blocks a Traffic Policy action

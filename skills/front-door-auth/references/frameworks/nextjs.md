@@ -50,4 +50,4 @@ export async function GET() {
 }
 ```
 
-The middleware enforces the boundary; the `headers()` reads attach identity to handlers. Don't read these headers from `Request.headers` in client components — they're not available there.
+The middleware enforces the boundary; the `headers()` reads attach identity to handlers. Don't read these headers from `Request.headers` in client components. They're not available there.

@@ -1,6 +1,6 @@
 ---
 name: front-door-auth
-description: Add OAuth authentication to a service without writing OAuth code. Sets up ngrok as an auth-aware front door — a public cloud endpoint runs OAuth and forwards to a private internal endpoint backing the app, which reads two trusted identity headers. Use when asked to delegate auth to ngrok, add OAuth without writing code, set up auth at the edge, build an auth-aware API gateway, or apply the front-door pattern.
+description: Add OAuth authentication to a service without writing OAuth code. Sets up ngrok as an auth-aware front door. A public cloud endpoint runs OAuth and forwards to a private internal endpoint backing the app, which reads two trusted identity headers. Use when asked to delegate auth to ngrok, add OAuth without writing code, set up auth at the edge, build an auth-aware API gateway, or apply the front-door pattern.
 license: MIT
 metadata:
   author: ngrok
@@ -8,7 +8,7 @@ metadata:
 compatibility: Requires ngrok CLI installed and authenticated (authtoken + API key).
 ---
 
-# Front-Door Auth
+# Front-door auth
 
 Set up ngrok as an auth-aware front door for a service. A public cloud endpoint runs a Traffic Policy that does OAuth, identity propagation, and `forward-internal`. The app sits behind an internal endpoint (`*.internal`) that's only routable from inside the user's ngrok account. The app reads `X-Forwarded-User-Email` and `X-Forwarded-User-Name` and trusts them.
 
@@ -46,7 +46,7 @@ Inspect the project to identify:
 - Framework. Check `package.json` (Hono, Express, Fastify, Next.js), `requirements.txt` or `pyproject.toml` (FastAPI, Flask), `go.mod`, `Gemfile`, etc.
 - Port. Check entrypoint files, `.env`, `package.json` scripts, `docker-compose.yml`. Default to 3000 for Node/TS, 8000 for Python, 8080 for Go.
 
-Frameworks not covered in `references/frameworks/` are still supportable. The trusted-header pattern is identical across them — read `X-Forwarded-User-Email` and `X-Forwarded-User-Name`, gate routes on whether the email is present, attach the identity to request context.
+Frameworks not covered in `references/frameworks/` are still supportable. The trusted-header pattern is identical across them: read `X-Forwarded-User-Email` and `X-Forwarded-User-Name`, gate routes on whether the email is present, attach the identity to request context.
 
 ### Step 2: Ask the user upfront
 
@@ -133,7 +133,7 @@ endpoints:
       url: localhost:{PORT}
 ```
 
-The `.internal` URL suffix auto-infers internal binding, so no `bindings:` field is needed.
+The `.internal` URL suffix auto-infers internal binding, so you don't need a `bindings:` field.
 
 ### Step 5: Add trusted-header middleware
 
@@ -143,7 +143,7 @@ The middleware always:
 
 - Reads `x-forwarded-user-email` and `x-forwarded-user-name` (case-insensitive in most frameworks).
 - Returns 401 if the email is missing on protected routes.
-- Falls back to `email.split('@')[0]` for the name when missing — some providers don't return a name.
+- Falls back to `email.split('@')[0]` for the name when missing, since some providers don't return a name.
 - Attaches `{ email, name }` to the framework's request/context object for handlers to use.
 
 Apply the middleware only to the routes the user said are protected. Leave public routes unmiddlewared.
@@ -158,7 +158,7 @@ ngrok api endpoints create \
   --traffic-policy-file traffic-policy.yml
 ```
 
-Capture the returned endpoint ID — the user will need it to push policy edits later.
+Capture the returned endpoint ID. The user will need it to push policy edits later.
 
 If this fails, see `references/troubleshooting.md`.
 
@@ -175,7 +175,7 @@ The internal endpoint at `{INTERNAL_NAME}.internal` is now serving the app.
 
 Tell the user:
 
-> Visit https://{DEV_DOMAIN}. You'll be redirected to {PROVIDER} to log in. After that, the app reads `X-Forwarded-User-Email` from each request. The cloud endpoint ID is `{ENDPOINT_ID}` — keep it for pushing policy edits.
+> Visit https://{DEV_DOMAIN}. You'll be redirected to {PROVIDER} to log in. After that, the app reads `X-Forwarded-User-Email` from each request. The cloud endpoint ID is `{ENDPOINT_ID}`. Keep it for pushing policy edits.
 
 ## Pushing policy edits
 
@@ -196,19 +196,25 @@ pkill ngrok
 
 ## Graduating to production
 
-The cloud endpoint is already permanent — it lives in the user's ngrok account, not the agent. The local agent is the only ephemeral piece.
+The cloud endpoint is already permanent. It lives in the user's ngrok account, not the agent. The local agent is the only ephemeral piece.
 
-- **Always-on local:** `sudo ngrok service install --config ~/.config/ngrok/ngrok.yml && sudo ngrok service start`
-- **Kubernetes / multi-instance:** deploy the agent as a sidecar (or its own deployment) with the same `ngrok.yml`. Multiple agents serving the same internal endpoint URL pool automatically.
+For an always-on local agent, install it as a service:
+
+```bash
+sudo ngrok service install --config ~/.config/ngrok/ngrok.yml
+sudo ngrok service start
+```
+
+For Kubernetes or multi-instance setups, deploy the agent as a sidecar (or its own deployment) with the same `ngrok.yml`. Multiple agents serving the same internal endpoint URL pool automatically.
 
 The cloud endpoint, the Traffic Policy, and the app code don't change.
 
 ## Reference
 
-- `references/frameworks/hono.md` — Hono middleware
-- `references/frameworks/express.md` — Express middleware
-- `references/frameworks/fastify.md` — Fastify pre-handler
-- `references/frameworks/nextjs.md` — Next.js middleware (App Router)
-- `references/frameworks/fastapi.md` — FastAPI dependency
-- `references/frameworks/flask.md` — Flask decorator
-- `references/troubleshooting.md` — Common errors
+- `references/frameworks/hono.md`: Hono middleware
+- `references/frameworks/express.md`: Express middleware
+- `references/frameworks/fastify.md`: Fastify pre-handler
+- `references/frameworks/nextjs.md`: Next.js middleware (App Router)
+- `references/frameworks/fastapi.md`: FastAPI dependency
+- `references/frameworks/flask.md`: Flask decorator
+- `references/troubleshooting.md`: Common errors
