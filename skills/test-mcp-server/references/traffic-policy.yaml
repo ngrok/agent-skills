@@ -1,34 +1,40 @@
-# Cloud endpoint Traffic Policy for the MCP front door.
-# Authenticates each model provider by its own bearer token (stored in a Vault),
-# tags which caller it is, then forwards to the internal MCP server.
-# Add a provider: add a secret to the vault and copy one rule.
+# Traffic policy for putting an ngrok cloud endpoint in front of any HTTP-reachable MCP server.
+
 on_http_request:
-  - name: authenticate-claude
+  - name: Only allow the MCP endpoint path
     expressions:
-      - "req.headers['authorization'].exists(v, v == 'Bearer ' + secrets.get('mcp-callers','claude-key'))"
+      - "!req.url.path.startsWith('/mcp')"
+    actions:
+      - type: deny
+
+  - name: claude
+    expressions:
+      - "'authorization' in req.headers && req.headers['authorization'].join(',') == 'Bearer ' + secrets.get('mcp-callers', 'claude-key')"
     actions:
       - type: add-headers
         config:
           headers:
             x-mcp-caller: claude
-  - name: authenticate-openai
+      - type: forward-internal
+        config:
+          url: https://mcp.internal
+
+  - name: open-ai
     expressions:
-      - "req.headers['authorization'].exists(v, v == 'Bearer ' + secrets.get('mcp-callers','openai-key'))"
+      - "'authorization' in req.headers && req.headers['authorization'].join(',') == 'Bearer ' + secrets.get('mcp-callers', 'openai-key')"
     actions:
       - type: add-headers
         config:
           headers:
-            x-mcp-caller: openai
-  - name: reject-unauthenticated
-    expressions:
-      - "!req.headers.exists('x-mcp-caller')"
+            x-mcp-caller: open-ai
+      - type: forward-internal
+        config:
+          url: https://mcp.internal
+
+  # Catch-all: anything that didn't match a known caller token is rejected.
+  - name: Reject unauthenticated or unrecognized requests
     actions:
       - type: custom-response
         config:
           status_code: 401
-          body: "unauthorized"
-  - name: forward-to-mcp-server
-    actions:
-      - type: forward-internal
-        config:
-          url: https://mcp.internal
+          body: "Unauthorized"

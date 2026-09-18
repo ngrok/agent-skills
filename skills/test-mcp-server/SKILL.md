@@ -7,7 +7,7 @@ metadata:
   version: "1.0"
   category: connectivity
   surface: job
-compatibility: Requires ngrok CLI installed and authenticated, and a locally running MCP server.
+compatibility: Requires a locally running MCP server, the ngrok CLI authenticated with an agent authtoken, and an ngrok API key (the cloud endpoint and Vault secrets are created via `ngrok api`).
 ---
 
 # Test an in-development MCP server
@@ -30,10 +30,16 @@ Cloud endpoint (not agent) is required here: providers connect on their own sche
 
 ## Steps
 
-1. **Give your MCP server an HTTP transport.** MCP dev servers are usually stdio; providers need streamable HTTP. Add an HTTP branch alongside stdio (drop in `references/http-transport.ts` and start it on a port when an env var is set). stdio keeps working for local clients.
+1. **Give your MCP server an HTTP transport.** MCP dev servers are usually stdio; providers need streamable HTTP. Drop in `references/http-transport.ts` and call it alongside your existing stdio path:
 
-2. **Run the server as an internal endpoint.** Bind it internal so it has no public URL:
-   `ngrok http <port> --binding=internal --url https://mcp.internal --host-header=rewrite`
+   ```ts
+   await runHttp(buildServer, port);        // POST /mcp, bound to 127.0.0.1
+   ```
+
+   It needs `express` and `@modelcontextprotocol/sdk`. It binds loopback by default, so the process is reachable only through the local ngrok agent - pass `{ host }` to change that. stdio keeps working for local clients.
+
+2. **Run the server as an internal endpoint.** The `.internal` URL is what makes it internal - no extra binding flag:
+   `ngrok http <port> --url https://mcp.internal --host-header=rewrite`
    The `--host-header=rewrite` matters: traffic arriving via `forward-internal` carries `Host: mcp.internal`, which the MCP SDK's DNS-rebinding protection rejects by default.
 
 3. **Create a vault + one secret per provider.** These are tokens you generate (not the provider's API key), so you can tell providers apart:
@@ -42,13 +48,18 @@ Cloud endpoint (not agent) is required here: providers connect on their own sche
    ngrok api secrets create --name "claude-key" --value "$(openssl rand -hex 32)" --vault-id "$VAULT_ID"
    ```
 
-4. **Create a cloud endpoint with the policy** (`references/traffic-policy.yaml`): authenticate each provider's bearer token, tag which caller it is, then `forward-internal` to `https://mcp.internal`. Attach via whichever surface fits (see `ngrok-surfaces`: Terraform or the operator for a durable setup, `ngrok api` from the CLI for a quick one).
+4. **Create a cloud endpoint with the policy** (`references/traffic-policy.yaml`). Its shape is security-critical, so use it as-is rather than re-deriving it: one rule per provider that matches that provider's bearer token, tags the caller, and `forward-internal`s - which is terminating - followed by an unconditional catch-all that returns 401. Anything without a valid token matches no provider rule and falls through to the 401.
+
+   Do **not** restructure it so the rejection tests the `x-mcp-caller` tag instead. That header is added by the policy but is also a request header, so a client can send it and skip the check entirely.
+
+   Attach via whichever surface fits (see `ngrok-surfaces`: Terraform or the operator for a durable setup, `ngrok api` from the CLI for a quick one).
 
 5. **Point each provider at `https://<your-cloud-endpoint>/mcp`** with its bearer token as a custom header. Add a provider later by adding a secret and copying its policy rule.
 
 ## Gotchas
 
 - **New server instance per request.** MCP's stateless HTTP pattern needs a fresh server object per request so concurrent providers don't share session state. `references/http-transport.ts` follows this.
+- **Caller attribution is advisory.** `x-mcp-caller` tells your server which provider called, but a client holding any valid token can also send that header itself. Trust it for logging, not for authorization.
 - **The `/mcp` path.** Providers expect the MCP endpoint at a path (commonly `/mcp`); make sure the transport and the URL you hand out agree.
 - **host-header rewrite** (step 2) - the single most common reason a forwarded MCP request 400s.
 
