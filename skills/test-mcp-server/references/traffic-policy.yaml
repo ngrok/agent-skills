@@ -1,0 +1,34 @@
+# Cloud endpoint Traffic Policy for the MCP front door.
+# Authenticates each model provider by its own bearer token (stored in a Vault),
+# tags which caller it is, then forwards to the internal MCP server.
+# Add a provider: add a secret to the vault and copy one rule.
+on_http_request:
+  - name: authenticate-claude
+    expressions:
+      - "req.headers['authorization'].exists(v, v == 'Bearer ' + secrets.get('mcp-callers','claude-key'))"
+    actions:
+      - type: add-headers
+        config:
+          headers:
+            x-mcp-caller: claude
+  - name: authenticate-openai
+    expressions:
+      - "req.headers['authorization'].exists(v, v == 'Bearer ' + secrets.get('mcp-callers','openai-key'))"
+    actions:
+      - type: add-headers
+        config:
+          headers:
+            x-mcp-caller: openai
+  - name: reject-unauthenticated
+    expressions:
+      - "!req.headers.exists('x-mcp-caller')"
+    actions:
+      - type: custom-response
+        config:
+          status_code: 401
+          body: "unauthorized"
+  - name: forward-to-mcp-server
+    actions:
+      - type: forward-internal
+        config:
+          url: https://mcp.internal
