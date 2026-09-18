@@ -41,7 +41,3 @@ ngrok verifies signatures for 70+ providers out of the box, including Stripe, Gi
 - **Replay protection**: ngrok rejects requests whose signed timestamp is outside the tolerance window (provider-suggested, else ~180s). Large clock skew on the receiver can cause false rejects.
 - **Body integrity**: nothing that rewrites the request body may run before this action, or the signature check fails.
 - **Free-tier cap**: free accounts have a monthly validation cap; if verification stops working at volume, that's the likely cause.
-
-## Maintainer note
-
-Provider identifiers and result-variable names mirror ngrok's verify-webhook docs.

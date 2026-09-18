@@ -1,13 +1,13 @@
 ---
 name: receive-webhooks
-description: Receive and verify inbound webhooks from providers like Stripe, GitHub, Twilio, Slack, or Shopify and deliver them to a local or private service without exposing that service to the public internet. Verify signatures at the edge with no app code; route third-party callbacks to a service behind a firewall, including regulated (HIPAA/PCI) environments or a centralized webhook gateway shared across teams. Use when the user needs to receive, test, or debug webhooks locally, wants signature verification without writing it, or must route callbacks to a private service. Use when the user says "test Stripe webhooks locally", "verify webhook signatures", "receive GitHub webhooks", or "forward webhooks to my private service".
+description: Receive and verify inbound webhooks from providers like Stripe, GitHub, Twilio, Slack, or Shopify and deliver them to a local or private service without exposing that service to the public internet. Verify signatures at the edge with no app code; route third-party callbacks to a service behind a firewall, including regulated (HIPAA/PCI) environments or a centralized webhook gateway shared across teams. Use when the user needs to receive, test, or debug webhooks locally, wants signature verification without writing it, or must route callbacks to a private service.
 license: MIT
 metadata:
   author: ngrok
   version: "1.0"
   category: connectivity
   surface: job
-compatibility: Requires ngrok CLI installed and authenticated.
+compatibility: Requires ngrok CLI installed and authenticated. Requires an ngrok API key to create Vaults and Secrets from the command line.
 ---
 
 # Receive webhooks
@@ -21,6 +21,7 @@ Auth is required (`ngrok-setup`). This job uses a Traffic Policy - pull the `ver
 ## Core pattern (every case)
 
 Two actions in sequence:
+
 1. `verify-webhook` - validate the signature (fails closed with 403 unless `enforce: false`).
 2. deliver - to a local port for testing, or `forward-internal` to a private receiver for production.
 
@@ -64,5 +65,5 @@ Give the user the public URL to paste into the provider's webhook settings.
 
 - Don't tell the user to write signature-verification code - the whole point is that `verify-webhook` replaces it.
 - Never hardcode the signing secret; use a Vault or env var.
-- Do not ask the user to paste the signing secret into the chat, and do not accept one offered that way. Have them put it in a Vault (`ngrok api secrets create`) or an env var themselves, and reference it from the policy. A `whsec_...` in a transcript is a leaked secret.
+- Do not ask the user to paste the signing secret into the chat, and do not accept one offered that way. Have them put it in a Vault via ngrok dashboard or API (`ngrok api secrets create`) or an env var themselves, and reference it from the policy. A `whsec_...` in a transcript is a leaked secret.
 - Nothing that rewrites the body may run before `verify-webhook`, or the signature check breaks.

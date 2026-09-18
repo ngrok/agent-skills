@@ -7,7 +7,7 @@ metadata:
   version: "1.0"
   category: connectivity
   surface: job
-compatibility: Requires an ngrok API key for the controlplane, and the ngrok agent or an SDK inside the provisioned workload. Reserved TCP addresses require a paid plan.
+compatibility: Requires an ngrok API key for the controlplane, and the ngrok agent or an SDK inside the provisioned workload.
 ---
 
 # Provision isolated access per sandbox
@@ -46,7 +46,15 @@ The internal hostname is derived from it too: `tcp://sandbox-<uuid>.internal:22`
 In the controlplane, before the workload starts:
 
 - **Service user** (`POST /service_users`) - owns the credential, so it is not attached to an employee account. Note this resource takes only `name`, no metadata; put the identifier in the name.
-- **Reserved TCP address** (`POST /reserved_addrs`) for raw TCP like SSH, or **reserved domain** (`POST /reserved_domains`) for HTTP. Region `us` unless the workload's users are elsewhere. The response's `addr` is the public `host:port` you hand to whoever connects.
+- **A public address**, which differs by protocol:
+  - **Raw TCP** (SSH, RDP, a database) -> `POST /reserved_addrs`. ngrok assigns the
+    `host:port` and returns it as `addr`. Takes a `region` (`us` unless the
+    workload's users are elsewhere), fixed at creation.
+  - **HTTP/TLS** -> `POST /reserved_domains`. You choose the hostname and it comes
+    back as `domain`, not `addr`. No `region` - that field is deprecated for
+    domains. A custom domain also needs its `cname_target` set in DNS before it
+    resolves; an ngrok-owned subdomain needs no DNS step, which is usually what you
+    want when provisioning per workload.
 
 Fill `description` with something a human can identify in the dashboard and `metadata` with a JSON string carrying your UUID. See `ngrok-surfaces` for why both, and for the exact bodies.
 
@@ -83,7 +91,7 @@ For HTTP workloads it is `on_http_request` and an `https://` internal URL. The p
 
 This endpoint exists immediately and is stable. It will refuse connections until the agent inside the workload comes up and binds the internal endpoint, which is the correct behavior: the address is allocated at provision time, reachable at boot time.
 
-Because the policy lives at the edge and not in the workload, this is also where you add controls the tenant cannot remove - `restrict-ips`, `oauth`, rate limits. See `secure-endpoint`.
+Because the policy lives at the edge and not in the workload, this is also where you add controls the sandbox cannot remove. On a TCP endpoint you can add `restrict-ips` or `deny` in `on_tcp_connect`. On an HTTP endpoint, those actions are available, as well as `oauth` and `rate-limit`. See `secure-endpoint` for more details.
 
 ## 5. Configure the agent inside the workload
 
@@ -109,26 +117,22 @@ Three strings must agree exactly: the internal URL in the agent config, the `for
 
 ## Tear it down
 
-Ephemeral workloads leave permanent ngrok resources behind, and reserved addresses keep billing. When the environment is destroyed, delete in reverse order: endpoint, credential, reserved address, service user. Store each `id` against your record at create time.
+When the environment is destroyed, delete in reverse order: endpoint, credential, the reserved TCP address or HTTP domain, service user. Store each `id` against your record at create time.
 
 Then run reconciliation anyway. Provisioning is a multi-call sequence that will fail partway through; a job that lists ngrok resources, parses `metadata`, and deletes those whose parent is gone is not optional at scale. `ngrok-surfaces` covers the delete calls.
 
 ## Scenarios
 
-**Ephemeral dev sandboxes (e2b, Daytona, Modal, Fly, your own runner).** The case above. SSH over a reserved TCP address, one per sandbox, torn down with the sandbox. Full walkthrough in `references/sandbox-ssh.md`.
+**Ephemeral dev sandboxes.** The case above. SSH over a reserved TCP address, one per sandbox, torn down with the sandbox. Full walkthrough in `references/sandbox-ssh.md`.
 
 **Customer-premises devices or networks.** Same resource set, longer-lived. One service user and ACL-scoped token per customer site so a compromise at one customer cannot touch another. Often several internal endpoints behind one agent (SSH, RDP, a database), each with its own cloud endpoint.
 
-**Per-developer preview environments.** A wildcard reserved domain and one cloud endpoint can serve everyone, routing on hostname to `<alias>.internal`, with a per-developer token scoped `bind:<alias>.internal`. Cheaper than a full resource set per person when the workloads are trusted. See `secure-endpoint` for the access-control side.
+**Per-developer preview environments.** A wildcard reserved domain and one cloud endpoint can serve everyone, routing on hostname to `<alias>.internal`, with a per-developer token scoped `bind:<alias>.internal`. See `secure-endpoint` for the access-control side.
 
 ## Notes for agents
 
 - Make the sequence idempotent and retry-safe, keyed on the caller's UUID. Partial provisioning is the normal failure mode.
 - Never suggest reusing one authtoken across tenants, and never suggest an unscoped token for a workload running user code. If the user proposes it, say plainly what it costs them.
 - Do not put the authtoken in a container image, a config file baked into the image, or logs. Environment variable from the provider's secret store.
-- Prefer the agent binary for a first implementation. Embedding ngrok in an existing process via an SDK (`ngrok-surfaces`) removes a moving part and is usually the right end state, but it is harder to debug when the endpoint URL is wrong - ship the binary first, then move it in.
-- If the user is on Kubernetes, the operator may be a better fit than raw API calls; see `ngrok-surfaces`. Note that TCP endpoints are not supported through the operator.
-
-## Maintainer note
-
-Resource bodies and policy syntax mirror https://ngrok.com/docs/api-reference/ and the endpoint and Traffic Policy docs,.
+- Prefer the agent binary for a first implementation. Embedding ngrok in an existing process via an SDK (`ngrok-surfaces`) removes a moving part and may be the right end state, but it is harder to debug when the endpoint URL is wrong.
+- If the user is on Kubernetes, the operator may be a better fit than raw API calls; see `ngrok-surfaces`.

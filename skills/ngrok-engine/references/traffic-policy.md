@@ -149,11 +149,20 @@ Allow or deny by client IP / CIDR.
 
 ```yaml
 on_http_request:
-  - expressions:
-      - "!(conn.client_ip in ['203.0.113.4/32', '198.51.100.0/24'])"
-    actions:
-      - type: deny
+  - actions:
+      - type: restrict-ips
+        config:
+          enforce: true
+          allow:
+            - 203.0.113.4/32
+            - 198.51.100.0/24
 ```
+
+Use `restrict-ips` for ranges. `conn.client_ip in [...]` does exact string
+comparison: it matches a bare address (`'203.0.113.4'`) but never a CIDR, because
+`203.0.113.4` is not equal to the string `203.0.113.4/32` - so a list of CIDRs
+matches nothing and the rule denies everyone. `restrict-ips` is what evaluates
+CIDRs. A CEL `in` test is fine for a couple of exact addresses.
 
 ### deny
 
@@ -257,9 +266,3 @@ Note that many actions already enforce on their own: `rate-limit` returns 429 it
 A terminating action ends the chain when it fires - `deny`, `custom-response`, `forward-internal`, and `close-connection` are the common ones. The catalog marks every action's terminating status.
 
 **Every Cloud Endpoint policy must end with a terminating action.** Agent endpoints have no such requirement, because they have an upstream to fall through to; a cloud endpoint does not, so a policy that ends without one has nowhere to send the traffic.
-
-## Maintainer note
-
-The seven actions written out in this file are hand-maintained and must match ngrok's published Traffic Policy schema; if one disagrees with current docs, the docs win - fix this file.
-
-`action-catalog.md` and everything in `actions/` are generated from https://ngrok.com/docs/gateway/traffic-policy/actions and are overwritten on regeneration - open an issue rather than editing them.

@@ -30,6 +30,3 @@ on_http_request:
       - type: forward-internal
         config: { url: https://ci.internal }
 ```
-
-## Maintainer note
-Provider identifiers mirror ngrok's verify-webhook docs.

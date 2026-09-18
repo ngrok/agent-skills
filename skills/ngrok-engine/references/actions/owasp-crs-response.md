@@ -10,7 +10,11 @@ Add OWASP CoreRuleSet to outgoing HTTP responses from your endpoints.
 
 ## Configuration
 
-None.
+| Field | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `on_error` | string | yes | Behavior if there is an error processing rules. Must be one of either `"continue"` or `"halt"` (default `"halt"`). More information can be found in the Managing Fallback Behavior section. |
+| `process_body` | bool | no | If `true`, rules for the response body are evaluated. Default is `false`. See Body Processing for details and limitations. |
+| `exclude_rule_ids` | array of integers | no | List of OWASP CRS rule IDs to exclude from evaluation. The minimum value is `900000` and the maximum value is `999999`. |
 
 ## Result variables
 

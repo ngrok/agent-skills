@@ -28,9 +28,15 @@ Validate JSON Web Tokens (JWTs) on your incoming requests.
 | `jws.allowed_algorithms` | array of strings | yes | List of allowed signing algorithms. The value `none` is not supported here because it is insecure. Minimum `1`. |
 | `jws.keys` | array of objects | yes | Configuration for the JWT signing keys. |
 | `jws.keys[*].identification` | array of objects | no | JWT metadata. |
-| `jws.keys[*].identification.keys[*].identification[*].token_claims` | array of strings | no | List of claims present in this token. Supported values: ['kid'] |
+| `jws.keys[*].identification[*].token_claims` | array of strings | no | List of claims present in this token. Supported values: ['kid'] |
 | `jws.keys[*].sources` | array of objects | yes | Configuration for the key material used to verify the signed JWTs. |
-| `jws.keys[*].sources.keys[*].sources[*].additional_jkus` | array of strings | yes | List of URLs which serve the possible signing keys in JWKS format. These URLs are cached and refreshed roughly every 15 minutes. Accepts CEL interpolation. |
+| `jws.keys[*].sources[*].additional_jkus` | array of strings | yes | List of URLs which serve the possible signing keys in JWKS format. These URLs are cached and refreshed roughly every 15 minutes. Accepts CEL interpolation. |
+
+### Field details
+
+**`http.tokens[*].method`**
+
+Location in the request to expect the JWT. When choosing `header`, the `content-type` header must be set to either `application/json` or `application/x-www-form-urlencoded`. When choosing `body`, the method must be `POST`, `PUT`, or `PATCH` Including a token as a URL query parameter is not supported.
 
 ## Result variables
 
@@ -67,7 +73,16 @@ Readable from `expressions` in later rules once this action has run.
                   prefix: 'Bearer '
                 - type: it+jwt
                   method: body
-# ...truncated, see the action's docs page
+                  name: _id_token
+            jws:
+              allowed_algorithms:
+                - RS256
+                - ES256
+              keys:
+                sources:
+                  additional_jkus:
+                    - https://example.com/issuer/jku
+
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/jwt-validation>

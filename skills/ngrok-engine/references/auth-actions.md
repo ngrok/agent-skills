@@ -58,26 +58,42 @@ Shared username/password. Friendly for a client who won't use an IdP.
 
 ## restrict-ips (via deny)
 
-There is no standalone "allow only" action; express it as deny-unless-in-list:
+Allow-only is `restrict-ips` with an `allow` list. It evaluates CIDRs; a CEL `in`
+test compares strings exactly, so it can match a bare address but never a CIDR
+(`conn.client_ip` is `203.0.113.4`, which is not the string `203.0.113.4/32`):
 
 ```yaml
-- expressions: ["!(conn.client_ip in ['203.0.113.4/32','198.51.100.0/24'])"]
-  actions: [ { type: deny } ]
+- actions:
+    - type: restrict-ips
+      config:
+        enforce: true
+        allow: ['203.0.113.4/32', '198.51.100.0/24']
 ```
 
 ## Bearer-token gate (used by test-mcp-server)
 
 Per-caller bearer tokens matched against Vault secrets, tagging which caller passed:
 
+Reject on the token itself, never on a marker header you added - `x-mcp-caller` is
+a request header, so a client can send it and skip the check.
+
 ```yaml
 on_http_request:
-  - expressions: ["req.headers['authorization'][0] == 'Bearer ' + secrets.get('mcp-callers','claude-key')"]
+  # strip any client-supplied marker first
+  - actions:
+      - type: remove-headers
+        config: { headers: [x-mcp-caller] }
+  # reject on the bearer token, not the marker
+  - expressions:
+      - "!req.headers['authorization'].exists(v, v == 'Bearer ' + secrets.get('mcp-callers','claude-key'))"
+    actions: [ { type: deny, config: { status_code: 401 } } ]
+  # only authenticated requests get tagged
+  - expressions:
+      - "req.headers['authorization'].exists(v, v == 'Bearer ' + secrets.get('mcp-callers','claude-key'))"
     actions:
       - type: add-headers
         config: { headers: { x-mcp-caller: claude } }
-  - expressions: ["!req.headers.exists('x-mcp-caller')"]
-    actions: [ { type: deny, config: { status_code: 401 } } ]
 ```
 
-## Maintainer note
-Action names, config keys, and identity/result variables mirror ngrok's Traffic Policy action docs. Auth action schemas change - verify before publishing.
+The canonical multi-provider version of this policy is
+`test-mcp-server/references/traffic-policy.yaml` - use it rather than re-deriving.

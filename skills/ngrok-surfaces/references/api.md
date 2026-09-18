@@ -95,7 +95,3 @@ Error bodies carry a machine-readable `error_code` (for example `ERR_NGROK_226`)
 - If the user is writing a provisioner, hand them idempotency: key off their own identifier, check before create, and make the whole sequence retry-safe. A half-provisioned sandbox is the normal failure, not an exotic one.
 - Do not invent fields. If a resource seems to be missing a field the user wants (as with Service User metadata), say so and work around it rather than emitting a body the API will reject.
 - API keys and authtokens are different credentials with different blast radii. Do not suggest reusing one for the other.
-
-## Maintainer note
-
-Request bodies, field limits, and resource paths mirror the ngrok API reference at https://ngrok.com/docs/api-reference/. The API reference is the source of truth.

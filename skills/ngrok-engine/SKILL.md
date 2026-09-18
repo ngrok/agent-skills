@@ -61,7 +61,7 @@ All 26 actions, so you know what exists without fetching anything:
 - **connection modification**: `deny`, `forward-internal`, `http-request`, `log`, `restrict-ips`, `set-vars`, `terminate-tls`
 - **request modification**: `add-headers`, `circuit-breaker`, `log`, `owasp-crs-request`, `rate-limit`, `redirect`, `remove-headers`, `request-body-find-replace`, `set-vars`, `url-rewrite`
 - **response modification**: `add-headers`, `compress-response`, `custom-response`, `log`, `owasp-crs-response`, `remove-headers`, `response-body-find-replace`, `set-vars`, `sse-find-replace`
-- **security**: `basic-auth`, `jwt-validation`, `oauth`, `oidc`, `owasp-crs-request`, `owasp-crs-response`, `restrict-ips`, `terminate-tls`, `verify-webhook`
+- **security**: `basic-auth`, `jwt-validation`, `oauth`, `openid-connect`, `owasp-crs-request`, `owasp-crs-response`, `restrict-ips`, `terminate-tls`, `verify-webhook`
 - **traffic control**: `circuit-breaker`, `close-connection`, `deny`, `forward-internal`, `http-request`, `owasp-crs-request`, `owasp-crs-response`, `rate-limit`
 <!-- END generated: action-names -->
 
@@ -77,9 +77,3 @@ Read only the action file you need; the whole directory is ~12k tokens and one a
 - The seven actions written out in `references/traffic-policy.md` are the ones existing job skills happen to use. They are not the interesting half - reach for the catalog whenever the task needs anything else.
 - Many actions enforce on their own (`rate-limit` returns its own 429, `verify-webhook` fails closed). Check the action's entry before adding a `deny` that duplicates it.
 - Keep the policy in its own `policy.yaml` so it survives the user adding a second surface later.
-
-## Maintainer note
-
-`references/action-catalog.md`, everything in `references/actions/`, and the action list above are generated from https://ngrok.com/docs/gateway/traffic-policy/actions and are overwritten on regeneration - open an issue rather than editing them.
-
-`references/endpoints.md` and `references/traffic-policy.md` mirror ngrok's endpoint and Traffic Policy docs. If either disagrees with current docs, the docs win.

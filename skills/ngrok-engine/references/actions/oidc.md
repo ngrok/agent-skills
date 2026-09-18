@@ -1,6 +1,8 @@
-# `oidc`
+# `openid-connect`
 
 **Generated from ngrok's published documentation - do not hand-edit.**
+
+Write `type: openid-connect` in a policy. This page is filed under the docs slug `oidc`, which is not a valid action type.
 
 Add OpenID Connect login for your HTTP endpoints.
 
@@ -29,22 +31,22 @@ Add OpenID Connect login for your HTTP endpoints.
 Readable from `expressions` in later rules once this action has run.
 
 - `actions.ngrok.oidc.error` (object)
-- `actions.ngrok.oidc.error.actions.ngrok.oidc.error.code` (string)
-- `actions.ngrok.oidc.error.actions.ngrok.oidc.error.message` (string)
+- `actions.ngrok.oidc.error.code` (string)
+- `actions.ngrok.oidc.error.message` (string)
 - `actions.ngrok.oidc.identity` (object)
-- `actions.ngrok.oidc.identity.actions.ngrok.oidc.identity.id` (string)
-- `actions.ngrok.oidc.identity.actions.ngrok.oidc.identity.email` (string)
-- `actions.ngrok.oidc.identity.actions.ngrok.oidc.identity.name` (string)
-- `actions.ngrok.oidc.identity.actions.ngrok.oidc.identity.provider_user_id` (string)
-- `actions.ngrok.oidc.identity.actions.ngrok.oidc.identity.current_session_id` (string)
+- `actions.ngrok.oidc.identity.id` (string)
+- `actions.ngrok.oidc.identity.email` (string)
+- `actions.ngrok.oidc.identity.name` (string)
+- `actions.ngrok.oidc.identity.provider_user_id` (string)
+- `actions.ngrok.oidc.identity.current_session_id` (string)
 - `actions.ngrok.oidc` (object)
-- `actions.ngrok.oidc.actions.ngrok.oidc.identity_token` (string)
-- `actions.ngrok.oidc.actions.ngrok.oidc.access_token` (string)
-- `actions.ngrok.oidc.actions.ngrok.oidc.refresh_token` (string)
-- `actions.ngrok.oidc.actions.ngrok.oidc.expires_at` (string)
-- `actions.ngrok.oidc.actions.ngrok.oidc.session_timed_out` (boolean)
-- `actions.ngrok.oidc.actions.ngrok.oidc.session_max_duration_reached` (boolean)
-- `actions.ngrok.oidc.actions.ngrok.oidc.user_info_refreshed` (boolean)
+- `actions.ngrok.oidc.identity_token` (string)
+- `actions.ngrok.oidc.access_token` (string)
+- `actions.ngrok.oidc.refresh_token` (string)
+- `actions.ngrok.oidc.expires_at` (string)
+- `actions.ngrok.oidc.session_timed_out` (boolean)
+- `actions.ngrok.oidc.session_max_duration_reached` (boolean)
+- `actions.ngrok.oidc.user_info_refreshed` (boolean)
 
 ## Example
 

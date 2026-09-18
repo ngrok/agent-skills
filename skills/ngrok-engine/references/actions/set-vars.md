@@ -12,7 +12,19 @@ Set custom variables for use in your traffic policy.
 
 | Field | Type | Required | Notes |
 | --- | --- | --- | --- |
-| `vars` | array of map[string]any | yes | List of maps that have a key of string and a value of any valid CEL type Each map must be of exactly size `1`, and represents one variable where the key is the name of the variable: ```yaml theme={null} vars: - variable_a: value - variable_... |
+| `vars` | array of map[string]any | yes | List of maps that have a key of string and a value of any valid CEL type Each map must be of exactly size `1`, and represents one variable where the key is the name of the variable: |
+
+### Field details
+
+**`vars`**
+
+List of maps that have a key of string and a value of any valid CEL type Each map must be of exactly size `1`, and represents one variable where the key is the name of the variable:
+
+```yaml
+vars:
+  - variable_a: value
+  - variable_b: value
+```
 
 ## Example
 
@@ -35,7 +47,17 @@ Set custom variables for use in your traffic policy.
               - sample_nested_map:
                   key:
                     - value1
-# ...truncated, see the action's docs page
+                    - value2
+    - expressions:
+        - vars.sample_bool == true
+      actions:
+        - type: custom-response
+          config:
+            status_code: 200
+            headers:
+              content-type: text/plain
+            body: ${vars.sample_string} ${vars.sample_double} ${vars.sample_list[0]} ${vars.sample_map.key} ${vars.sample_nested_map.key[1]}
+
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/set-vars>

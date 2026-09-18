@@ -170,9 +170,3 @@ Tradeoffs to weigh before doing it:
 See `ngrok-surfaces` for the per-language SDK surface. Do not port the agent config to SDK calls
 from memory - the shapes differ, and a wrong endpoint URL fails in a way that looks
 like a network problem.
-
-## Maintainer note
-
-Agent config keys, API bodies, and the ACL semantics mirror ngrok's published docs and
-are. The agent download URL and the SDK builder calls
-are the two things most likely to drift - verify both before publishing.

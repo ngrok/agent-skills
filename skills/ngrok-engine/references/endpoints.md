@@ -67,7 +67,3 @@ What every surface shares:
 - An internal endpoint is bound as internal (it gets an `.internal` URL and no public address).
 - A `forward-internal` policy action targets that internal URL (see `traffic-policy.md`).
 - A cloud endpoint carries a Traffic Policy that runs whether or not any agent is connected.
-
-## Maintainer note
-
-Binding names and URL conventions mirror ngrok's endpoint docs. If this disagrees with current ngrok docs, the docs win.

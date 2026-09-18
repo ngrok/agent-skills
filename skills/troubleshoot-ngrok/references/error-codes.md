@@ -25,6 +25,3 @@ Fix: set the framework's allowed-hosts to the ngrok domain, or rewrite the host 
 
 ## Others
 Session/endpoint limits, TLS/cert issues, DNS or reserved-domain problems each have their own ERR_NGROK code. For any code not listed here, read the code's meaning from ngrok's error-code docs and match cause->fix the same way.
-
-## Maintainer note
-Codes and their meanings mirror ngrok's published error-code docs.

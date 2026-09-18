@@ -78,9 +78,3 @@ the names are `cloud_endpoint`, `domain`, and `tcp_address`.
 `service_user`, `credential`, and `tcp_address` are the per-tenant provisioning set.
 If those are being created per workload at runtime rather than at deploy time, that
 is the REST API's job - see `provision-sandbox-access`.
-
-## Maintainer note
-
-Resource names and the example schemas were verified against the published
-provider docs for **ngrok/ngrok v0.8.1**. Pin expectations to a provider version:
-IaC schemas drift, and the resource list above is version-specific.

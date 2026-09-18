@@ -43,11 +43,20 @@ Allow only known addresses/CIDRs; deny the rest.
 
 ```yaml
 on_http_request:
-  - expressions:
-      - "!(conn.client_ip in ['203.0.113.4/32', '198.51.100.0/24'])"
-    actions:
-      - type: deny
+  - actions:
+      - type: restrict-ips
+        config:
+          enforce: true
+          allow:
+            - 203.0.113.4/32
+            - 198.51.100.0/24
 ```
+
+Use `restrict-ips` for ranges. `conn.client_ip in [...]` does exact string
+comparison: it matches a bare address (`'203.0.113.4'`) but never a CIDR, because
+`203.0.113.4` is not equal to the string `203.0.113.4/32` - so a list of CIDRs
+matches nothing and the rule denies everyone. `restrict-ips` is what evaluates
+CIDRs. A CEL `in` test is fine for a couple of exact addresses.
 
 ### Block a path or condition (deny)
 
@@ -61,7 +70,7 @@ on_http_request:
 
 ### Rate limit
 
-Throttle by client to protect the upstream. Get the current `rate-limit` action config from `ngrok-engine` (it takes a name, rate, and bucket key) and attach it the same way as the others.
+Throttle by client to protect the upstream. Get the current `rate-limit` action config from `ngrok-engine` (it takes a name, rate, bucket key, algorithm, and capacity) and attach it the same way as the others.
 
 ### Maintenance page / custom response
 
@@ -84,7 +93,12 @@ on_http_request:
   - expressions: ["req.url.path == '/healthz'"]
     actions:
       - type: custom-response
-        config: { status_code: 200, headers: { content-type: text/plain }, body: "ok" }
+        config:
+          {
+            status_code: 200,
+            headers: { content-type: text/plain },
+            body: "ok",
+          }
 ```
 
 ### Add / strip headers

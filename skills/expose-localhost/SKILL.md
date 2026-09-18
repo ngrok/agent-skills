@@ -116,7 +116,16 @@ on_http_request:
           status_code: 403
 ```
 
-Multiple emails — use `!(.. in ['a@x.com', 'b@x.com'])` in the expression.
+Multiple emails — name the identity explicitly on the left of `in`:
+
+```yaml
+  - expressions:
+      - "!(actions.ngrok.oauth.identity.email in ['a@x.com', 'b@x.com'])"
+    actions:
+      - type: deny
+        config:
+          status_code: 403
+```
 
 **Shared secret** (when the person won't log in with an IdP — an external client, a
 reviewer without a company account):
@@ -246,6 +255,7 @@ on_tcp_connect:
   - actions:
       - type: restrict-ips
         config:
+          enforce: true
           allow:
             - 203.0.113.0/24
 ```

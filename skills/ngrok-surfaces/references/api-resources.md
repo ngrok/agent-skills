@@ -57,6 +57,39 @@ Response: `id`, `uri`, `addr` (the assigned `host:port`, e.g. `1.tcp.ngrok.io:12
 TCP addresses are a paid-plan resource and they continue to bill until deleted.
 Delete: `DELETE /reserved_addrs/{id}`.
 
+## Reserved domain - `POST /reserved_domains`
+
+The HTTP/TLS equivalent of a reserved address. Unlike addresses, you **choose** the
+hostname.
+
+```bash
+curl -X POST https://api.ngrok.com/reserved_domains \
+  -H "Authorization: Bearer $NGROK_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Ngrok-Version: 2" \
+  -d '{
+        "domain": "sbx-123.example.com",
+        "description": "Web preview for sandbox sbx_123",
+        "metadata": "{\"tenant_id\":\"7c9e\",\"sandbox_id\":\"sbx_123\"}"
+      }'
+```
+
+Request: `domain` (the hostname), `description`, `metadata`.
+Response: `id`, `uri`, `domain`, `cname_target`, `description`, `metadata`,
+`created_at`, plus certificate management fields.
+
+Differences from a reserved address:
+
+- **You pick the hostname**; ngrok assigns nothing. The response echoes it as
+  `domain` - there is no `addr` field.
+- **`region` is deprecated here.** Domains are no longer bound to a region. Only
+  reserved *addresses* take a region.
+- **A custom domain needs DNS.** The response's `cname_target` must be set as a CNAME
+  before traffic resolves. It is null for ngrok-owned subdomains (`*.ngrok.app`),
+  which need no DNS step - use those to avoid the extra round trip per workload.
+
+Delete: `DELETE /reserved_domains/{id}`.
+
 ## Credential (agent authtoken) - `POST /credentials`
 
 The token an agent uses to start a session. This is the security boundary in a
@@ -152,9 +185,3 @@ For secrets a policy reads at runtime via `${secrets.get('vault', 'name')}`. See
 ngrok api vaults create --name "tenant-secrets"
 ngrok api secrets create --name "webhook-signing-secret" --value "whsec_.." --vault-id "$VAULT_ID"
 ```
-
-## Maintainer note
-
-Field names, limits, and enum values mirror https://ngrok.com/docs/api-reference/ and
-are. Where this file and the API reference disagree,
-the API reference wins.

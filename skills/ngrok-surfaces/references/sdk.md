@@ -83,10 +83,7 @@ fwd, err := ngrok.Forward(ctx,
 `ngrok.Listen(ctx)` reads `NGROK_AUTHTOKEN` from the environment on its own. To pass
 one explicitly, build an agent with `ngrok.NewAgent(ngrok.WithAuthtoken(token))`.
 
-**Do not use `config.HTTPEndpoint(..)` or `ngrok.WithAuthtokenFromEnv()`.** Both are
-from the legacy v1 API - the former is no longer public and returns a type
-`ngrok.Listen` will not accept, so code using them does not compile. This was a real
-dead end in an earlier version of these skills; see `papercuts.md`.
+**Do not use `config.HTTPEndpoint(..)` or `ngrok.WithAuthtokenFromEnv()`.**.
 
 Docs: <https://pkg.go.dev/golang.ngrok.com/ngrok/v2>
 
@@ -122,10 +119,3 @@ Docs: <https://docs.rs/ngrok/latest/ngrok/>
   version independently of each other and of the agent.
 - Check the project's lockfile before emitting code. A wrong method name fails at
   compile time if you are lucky and at runtime if you are not.
-
-## Maintainer note
-
-Per-language method names and option keys drift independently. All four languages here were verified against their current SDK sources: the
-JavaScript quickstart, ngrok-python's README, `golang.ngrok.com/ngrok/v2`, and
-ngrok-rust's endpoint config. Re-verify on SDK releases - they version
-independently of each other and of the agent.

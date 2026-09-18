@@ -77,8 +77,3 @@ A `kubernetes` binding makes an endpoint addressable only inside clusters runnin
 operator. The operator creates a `v1.Service` for it, named from the URL's hostname:
 `http://webapp-cust1.acme-customers` creates Service `webapp-cust1` in namespace
 `acme-customers`.
-
-## Maintainer note
-
-CRD apiVersions and field names mirror the ngrok Kubernetes Operator docs, which
-are the source of truth.

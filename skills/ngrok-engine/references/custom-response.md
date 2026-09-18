@@ -54,6 +54,3 @@ on_http_request:
       - type: custom-response
         config: { status_code: 403, headers: { content-type: text/html }, body: "<h1>Not available</h1>" }
 ```
-
-## Maintainer note
-Config keys and interpolation variables mirror ngrok's custom-response docs.

@@ -14,13 +14,24 @@ Send an HTTP request to a third-party API and return the response.
 | --- | --- | --- | --- |
 | `url` | string | yes | The destination URL for the HTTP request. Accepts CEL interpolation. |
 | `method` | enum | no | The HTTP method to use for the request. Values: `GET` (default), `PUT`, `POST`, `PATCH`, `DELETE`, `OPTIONS` |
-| `query_params` | list of objects | no | A list of query parameters to append to the URL. Each item is an object with the following structure: ```yaml theme={null} - key: "parameter_name" value: "parameter_value" ``` Maximum: `32` entries. Key max length: `128` chars. Accepts CEL interpolation. |
+| `query_params` | list of objects | no | A list of query parameters to append to the URL. Each item is an object with the following structure: Maximum: `32` entries. Key max length: `128` chars. Value max length: `8192` chars. Accepts CEL interpolation. |
 | `headers` | object | no | A map of HTTP headers to include in the request. Keys are header names and values are header values. Maximum: `10` entries. Accepts CEL interpolation. |
 | `body` | string | no | The body of the HTTP request. Supported on methods like `POST`, `PUT`, or `PATCH`. Accepts CEL interpolation. |
 | `max_redirects` | int | no | The maximum number of HTTP redirects to follow. The minimum allowed is `0`. The maximum allowed is `100`. |
 | `timeout` | duration | no | The maximum duration as a duration string to wait for the entire request (including retries and redirects). The minimum allowed is `1s`. The maximum allowed is `30s`. |
 | `retry_condition` | string | no | A CEL expression evaluated after each failed attempt. If `true`, the request is retried (up to `3` times). Values: `attempts` (`int`): Total number of attempts so far, `last_attempt.req`: The last request object, `last_attempt.res`: The last response object (if any), `last_attempt.error`: The error string (if any) Accepts CEL interpolation. |
 | `on_error` | enum | no | Determines how to proceed if the HTTP request fails. Values: `continue` (default) – Proceed with remaining actions, `halt` – Stop processing the policy |
+
+### Field details
+
+**`query_params`**
+
+A list of query parameters to append to the URL. Each item is an object with the following structure: Maximum: `32` entries. Key max length: `128` chars. Value max length: `8192` chars.
+
+```yaml
+  - key: "parameter_name"
+value: "parameter_value"
+```
 
 ## Result variables
 

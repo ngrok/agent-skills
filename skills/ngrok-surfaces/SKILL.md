@@ -55,7 +55,3 @@ These are not interchangeable and have very different blast radii. If a call fai
 - Keep the policy in its own `policy.yaml` and reference it. That is what makes it portable when the user adds a second surface later, which they usually do.
 - TCP endpoints are **not** supported by the Kubernetes Operator. If the user needs TCP on k8s, surface that early rather than discovering it late.
 - Do not port config between surfaces from memory - the shapes differ enough to fail in ways that look like network problems. Read the target surface's reference file.
-
-## Maintainer note
-
-Each reference file states its own source of truth and is. Surface syntax drifts independently: the CLI with agent releases, the SDKs per language, the API with the OpenAPI spec, the provider and operator on their own schedules.

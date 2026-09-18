@@ -118,7 +118,3 @@ authtoken. See `api.md`.
 - Run these yourself rather than handing the user instructions.
 - The policy YAML is identical to what `ngrok-engine` documents; only
   `--traffic-policy-file` / the `traffic_policy:` block is CLI-specific.
-
-## Maintainer note
-
-Flags and config keys mirror ngrok's agent docs, which are the source of truth.
