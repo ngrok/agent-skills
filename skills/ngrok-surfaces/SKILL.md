@@ -38,7 +38,7 @@ Surfaces differ by **when the resource is created and what owns its lifetime**:
 - **Terraform and the Operator** declare it at deploy time, for a set of endpoints known in advance and checked into a repo.
 - **The REST API** creates it at run time from outside the workload, for a set that is *not* known in advance - one per sandbox, customer, or device, with thousands of them.
 
-Terraform and the API look interchangeable and are not. "My account has these three endpoints" is Terraform. "Every sandbox gets one" is the API. See `provision-tenant-access` for the latter.
+Terraform and the API look interchangeable and are not. "My account has these three endpoints" is Terraform. "Every sandbox gets one" is the API. See `provision-sandbox-access` for the latter.
 
 A single setup often uses two: the API or Terraform provisions the public cloud endpoint, and the CLI or SDK brings up the internal endpoint from inside the workload. They rendezvous on an agreed internal hostname.
 

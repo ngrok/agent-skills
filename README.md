@@ -24,6 +24,7 @@ Give a local service a public URL. HTTP, or raw TCP for SSH, RDP, and databases.
 - "Expose my local server"
 - "Make my app publicly accessible"
 - "Share my local service with a coworker"
+- "Let my client preview my dev site, but not the whole internet"
 - "SSH into a box with no public IP"
 
 ### secure-endpoint
@@ -35,15 +36,6 @@ Put authentication, rate limiting, IP rules, or a custom response in front of an
 - "Only allow my office IP range"
 - "Rate limit my API"
 - "Put up a maintenance page"
-
-### share-dev-environment
-
-Share work in progress with one specific person, access-controlled and temporary.
-
-**Use when:**
-- "Let my designer see my local build"
-- "Send a client a preview they can actually open"
-- "Share my dev server, but not with the whole internet"
 
 ### receive-webhooks
 
@@ -62,7 +54,7 @@ Expose an MCP server you are developing so Claude, OpenAI, or another provider c
 - "Let Claude connect to my local MCP server"
 - "Test my MCP server against a real client"
 
-### provision-tenant-access
+### provision-sandbox-access
 
 Give every sandbox, container, customer device, or tenant its own isolated endpoint, provisioned programmatically from a controlplane.
 

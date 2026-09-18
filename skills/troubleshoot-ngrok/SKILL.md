@@ -34,7 +34,7 @@ Others (agent session limits, TLS, DNS/reserved-domain issues) are in `reference
 
 - **URL loads an ngrok error page** -> almost always 3200 (offline) or an upstream error (8012). Check agent running, then local service running.
 - **Agent exits immediately on start** -> auth (see `ngrok-setup`) or a config-file parse error.
-- **Works locally, 400/rejected through the URL** -> host-header or allowed-hosts mismatch (common with dev servers and internal forwarding); see the host-header notes in `share-dev-environment` / `test-mcp-server`.
+- **Works locally, 400/rejected through the URL** -> host-header or allowed-hosts mismatch (common with dev servers and internal forwarding); see the host-header notes in `expose-localhost` (`references/TROUBLESHOOTING.md`) / `test-mcp-server`.
 - **Policy has no effect** -> it may not be attached to the endpoint being hit; confirm attachment per the surface skill.
 
 ## Notes for agents

@@ -21,7 +21,7 @@ Fix: validate against the traffic-policy skill; confirm action names/config keys
 
 ## Host-header / rejected-through-URL (symptom, may have no single code)
 Works locally, 400/rejected via the public URL. Dev servers and internal-forwarded services reject an unexpected Host.
-Fix: set the framework's allowed-hosts to the ngrok domain, or rewrite the host header (--host-header=rewrite for internal forwarding; see share-dev-environment / test-mcp-server).
+Fix: set the framework's allowed-hosts to the ngrok domain, or rewrite the host header (--host-header=rewrite for internal forwarding; see expose-localhost's TROUBLESHOOTING.md / test-mcp-server).
 
 ## Others
 Session/endpoint limits, TLS/cert issues, DNS or reserved-domain problems each have their own ERR_NGROK code. For any code not listed here, read the code's meaning from ngrok's error-code docs and match cause->fix the same way.

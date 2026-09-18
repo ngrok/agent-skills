@@ -52,7 +52,7 @@ Full request bodies, responses, and the ordering constraints between them are in
 
 Two shapes to know before you write the calls:
 
-**Credential ACLs.** `acl` is a list of `bind:` rules limiting which endpoints a token may create. A token with no ACL can create any endpoint on the account - never hand an unscoped token to code you do not control. See `provision-tenant-access` for how this is the load-bearing security control in a multi-tenant setup.
+**Credential ACLs.** `acl` is a list of `bind:` rules limiting which endpoints a token may create. A token with no ACL can create any endpoint on the account - never hand an unscoped token to code you do not control. See `provision-sandbox-access` for how this is the load-bearing security control in a multi-tenant setup.
 
 ```json
 {"description": "..", "acl": ["bind:tcp://sandbox-7c9e.internal:22"]}

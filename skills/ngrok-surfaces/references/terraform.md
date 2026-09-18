@@ -77,7 +77,7 @@ the names are `cloud_endpoint`, `domain`, and `tcp_address`.
 
 `service_user`, `credential`, and `tcp_address` are the per-tenant provisioning set.
 If those are being created per workload at runtime rather than at deploy time, that
-is the REST API's job - see `provision-tenant-access`.
+is the REST API's job - see `provision-sandbox-access`.
 
 ## Maintainer note
 

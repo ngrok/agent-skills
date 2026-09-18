@@ -1,6 +1,6 @@
 ---
 name: expose-localhost
-description: Expose a local service to the public internet using ngrok. Starts a tunnel, optionally adds OAuth or WAF via Traffic Policy. Handles HTTP services and raw TCP (SSH, RDP, databases). Use when asked to expose, tunnel, share, or make a local service publicly accessible, or to reach a machine that has no public IP.
+description: Expose a local service to the public internet using ngrok. Starts a tunnel, optionally adds OAuth or WAF via Traffic Policy. Handles HTTP services and raw TCP (SSH, RDP, databases). Use when asked to expose, tunnel, share, or make a local service publicly accessible, or to reach a machine that has no public IP. Also covers sharing work-in-progress with a specific person and the dev-server quirks that break a shared preview.
 license: MIT
 metadata:
   author: ngrok
@@ -118,6 +118,21 @@ on_http_request:
 
 Multiple emails — use `!(.. in ['a@x.com', 'b@x.com'])` in the expression.
 
+**Shared secret** (when the person won't log in with an IdP — an external client, a
+reviewer without a company account):
+
+```yaml
+on_http_request:
+  - actions:
+      - type: basic-auth
+        config:
+          credentials:
+            - "reviewer:{PASSWORD}"
+```
+
+Hand them the URL and the password over a channel you already trust. If they have a
+stable IP, `restrict-ips` is an alternative with nothing to share.
+
 **Open-access hardening** (no auth, but wants protection):
 
 ```yaml
@@ -151,6 +166,10 @@ curl -s http://localhost:4040/api/tunnels | grep -o '"public_url":"[^"]*"' | hea
 ```
 
 Add `--url https://{DOMAIN}` if using a specific domain.
+
+**Sharing a dev server?** Vite, Next, and webpack reject requests whose Host header
+isn't localhost, and their hot-reload websockets need the ngrok domain allowed. Set
+this up before handing over the URL — see `references/TROUBLESHOOTING.md`.
 
 ### Step 3: Handle Errors
 
@@ -262,14 +281,14 @@ The traffic policy must end with:
 This skill covers giving a service a public URL. Neighbouring jobs have their own
 skills — hand off rather than reimplementing them here:
 
-- **Only certain people should reach it** — `share-dev-environment` for a preview
-  for one named person, `secure-endpoint` for auth, rate limits, IP rules, or a
-  maintenance page in general.
+- **Auth, rate limits, IP rules, or a maintenance page in general** —
+  `secure-endpoint`. (Sharing a preview with one named person is handled here, in
+  Step 2.)
 - **It should receive webhooks** — `receive-webhooks` verifies provider signatures
   at the edge and can keep the receiver off the public internet.
 - **It is an MCP server** — `test-mcp-server` handles per-provider credentials.
 - **One endpoint per sandbox, tenant, or device, created by a controlplane** —
-  `provision-tenant-access`.
+  `provision-sandbox-access`.
 - **Something is broken** (`ERR_NGROK_*`, a 400 through the URL but not on
   localhost) — `troubleshoot-ngrok`.
 - **Setup or auth problems** — `ngrok-setup`.

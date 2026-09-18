@@ -18,9 +18,9 @@ Source of truth: <https://ngrok.com/docs/gateway/endpoints/>
 - Must stay up when no agent is running, or an external system connects to it on its own (webhook providers, MCP clients, partners) -> **cloud endpoint** as the public front door.
 - The receiver must not be publicly reachable (private service, firewall, compliance) -> run it as an **internal endpoint** and put an agent or cloud endpoint in front that forwards to it.
 
-Common composed shape (used by receive-webhooks, test-mcp-server, and provision-tenant-access): **cloud endpoint (public, runs the policy) -> forward-internal -> internal endpoint -> local service.**
+Common composed shape (used by receive-webhooks, test-mcp-server, and provision-sandbox-access): **cloud endpoint (public, runs the policy) -> forward-internal -> internal endpoint -> local service.**
 
-One more axis, orthogonal to the three types: whether the workload set is known ahead of time. If every environment, tenant, or device needs its *own* endpoint and they are created at runtime, the choice above is still cloud-plus-internal - but the provisioning is programmatic. See `provision-tenant-access`.
+One more axis, orthogonal to the three types: whether the workload set is known ahead of time. If every environment, tenant, or device needs its *own* endpoint and they are created at runtime, the choice above is still cloud-plus-internal - but the provisioning is programmatic. See `provision-sandbox-access`.
 
 ## Non-HTTP endpoints
 
@@ -28,7 +28,7 @@ Endpoint type and protocol are separate choices. Any of the three types can carr
 
 What changes for TCP:
 
-- **A public TCP endpoint needs a reserved TCP address to have a stable URL.** Unlike domains, the hostname and port are assigned by ngrok and cannot be chosen; you get something like `1.tcp.ngrok.io:12345`. Reserve one via the API (`provision-tenant-access`, or `ngrok-surfaces` for the call) or the dashboard. Without one, the address changes every session.
+- **A public TCP endpoint needs a reserved TCP address to have a stable URL.** Unlike domains, the hostname and port are assigned by ngrok and cannot be chosen; you get something like `1.tcp.ngrok.io:12345`. Reserve one via the API (`provision-sandbox-access`, or `ngrok-surfaces` for the call) or the dashboard. Without one, the address changes every session.
 - **Reserved addresses carry a region** (`us`, `eu`, `ap`, `au`, `jp`, `in`, `sa`), chosen at creation and fixed thereafter.
 - **A TCP address is only needed for the public binding.** Internal and kubernetes-bound TCP endpoints do not need one.
 - **Internal TCP URLs require an explicit port**: `tcp://db.internal:5432`, not `tcp://db.internal`. HTTP internal URLs may omit it.

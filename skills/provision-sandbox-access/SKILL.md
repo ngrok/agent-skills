@@ -1,6 +1,6 @@
 ---
-name: provision-tenant-access
-description: Give every tenant, sandbox, container, or customer device its own isolated ngrok endpoint, provisioned programmatically at runtime from a controlplane. Covers the per-workload resource set - service user, reserved address or domain, ACL-scoped authtoken, cloud endpoint forwarding to a private internal endpoint - plus the agent config that runs inside the workload, and teardown. Use when the user is building a platform that spins up isolated environments, says "each sandbox needs its own SSH access", "one endpoint per customer", "per-tenant tunnel", "multi-tenant ngrok", "provision ngrok from our controlplane", or needs to reach into ephemeral containers on e2b, Daytona, Modal, Fly, or their own fleet.
+name: provision-sandbox-access
+description: Give every sandbox, container, device, or tenant its own isolated ngrok endpoint, provisioned programmatically at runtime from a controlplane. Covers the per-workload resource set - service user, reserved address or domain, ACL-scoped authtoken, cloud endpoint forwarding to a private internal endpoint - plus the agent config that runs inside the workload, and teardown. Use when the user is building a platform that spins up isolated environments.
 license: MIT
 metadata:
   author: ngrok
@@ -10,11 +10,11 @@ metadata:
 compatibility: Requires an ngrok API key for the controlplane, and the ngrok agent or an SDK inside the provisioned workload. Reserved TCP addresses require a paid plan.
 ---
 
-# Provision isolated access per tenant
+# Provision isolated access per sandbox
 
 The job: a controlplane creates an environment - a sandbox, a container, a customer appliance - and each one needs its own reachable, isolated entry point. Not one shared endpoint with routing, but a separate set of ngrok resources per workload, created and destroyed with it.
 
-This differs from `expose-localhost` in lifecycle and trust. There, a developer exposes their own machine and trusts themselves. Here, a platform exposes *someone else's* workload, at machine speed, and must assume the code inside it is hostile.
+This differs from `expose-localhost` in lifecycle and trust. There, a developer exposes their own machine and trusts themselves. Here, a platform exposes _someone else's_ workload, at machine speed, and must assume the code inside it is hostile.
 
 ## Before you start
 
@@ -119,7 +119,7 @@ Then run reconciliation anyway. Provisioning is a multi-call sequence that will 
 
 **Customer-premises devices or networks.** Same resource set, longer-lived. One service user and ACL-scoped token per customer site so a compromise at one customer cannot touch another. Often several internal endpoints behind one agent (SSH, RDP, a database), each with its own cloud endpoint.
 
-**Per-developer preview environments.** A wildcard reserved domain and one cloud endpoint can serve everyone, routing on hostname to `<alias>.internal`, with a per-developer token scoped `bind:<alias>.internal`. Cheaper than a full resource set per person when the workloads are trusted. See `share-dev-environment` for the access-control side.
+**Per-developer preview environments.** A wildcard reserved domain and one cloud endpoint can serve everyone, routing on hostname to `<alias>.internal`, with a per-developer token scoped `bind:<alias>.internal`. Cheaper than a full resource set per person when the workloads are trusted. See `secure-endpoint` for the access-control side.
 
 ## Notes for agents
 

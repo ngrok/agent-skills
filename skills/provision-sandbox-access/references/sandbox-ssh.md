@@ -1,6 +1,6 @@
 # Worked example: SSH into ephemeral sandbox containers
 
-Companion to `provision-tenant-access`. The case: a controlplane spins up sandbox
+Companion to `provision-sandbox-access`. The case: a controlplane spins up sandbox
 containers on a provider (e2b, Daytona, Modal, Fly, a self-hosted runner) and each
 sandbox must be SSH-reachable without a public IP and without the sandboxes being
 able to reach each other.
