@@ -8,10 +8,10 @@ Skills follow the [Agent Skills](https://agentskills.io/) format.
 
 ```bash
 # everything
-npx skills add ngrok/agent-skills
+npx skills add ngrok/skills
 
 # or just what you need
-npx skills add ngrok/agent-skills --skill expose-localhost
+npx skills add ngrok/skills --skill expose-localhost
 ```
 
 ## Available Skills
